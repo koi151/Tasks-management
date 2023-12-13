@@ -102,17 +102,31 @@ module.exports.changeMulti = async (req, res) => {
     switch(key) {
       case "status": 
         await Task.updateMany({
-          _id: {$in: ids}
+          _id: { $in: ids }
         }, {
           status: value
         })
 
         res.json({
           code: 200,
-          message: 'Update status successful!'
+          message: 'Update multiple status successful!'
         });
         break;
-
+      
+      case "delete":
+        await Task.updateMany({
+          _id: { $in: ids }
+        }, {
+          deleted: true,
+          deletedAt: Date()
+        })
+        
+        res.json({
+          code: 200,
+          message: 'Multiple tasks deleted successfully!'
+        });
+        break;
+      
       default: 
         res.json({
           code: 400,
@@ -120,12 +134,78 @@ module.exports.changeMulti = async (req, res) => {
         });
         break;
     }
-    
+
   } catch (error) {
     console.log('Error occured:', error);
     res.json({
       code: 400,
       massage: "Not existed"
+    });
+  }
+}
+
+// [POST] /api/v1/tasks/create
+module.exports.create = async (req, res) => {
+  try {
+    const task = new Task(req.body)
+    await task.save();
+
+    res.json({
+      code: 200,
+      message: 'Create task successful!'
+    });
+    
+  } catch (error) {
+    console.log('Error occured:', error);
+    res.json({
+      code: 400,
+      massage: "Error occurred while creating task"
+    });
+  }
+}
+
+// [PATCH] /api/v1/tasks/edit/:id
+module.exports.editPatch = async (req, res) => {
+  try {
+    await Task.updateOne(
+      { _id: req.params.id }, 
+      req.body
+    )
+     
+    res.json({
+      code: 200,
+      massage: "Update task successfull!"
+    });
+
+  } catch (error) {
+    console.log('Error occured:', error);
+    res.json({
+      code: 400,
+      massage: "Not existed"
+    });
+  }
+}
+
+// [DELETE] /api/v1/tasks/delete/:id
+module.exports.deleteTask = async (req, res) => {
+  try {
+    await Task.updateOne({
+      _id: req.params.id
+    }, {
+      deleted: true,
+      deletedAt: Date()
+    })
+
+    res.json({
+      code: 200,
+      message: 'Task deleted successful!'
+    });
+    
+  } catch (error) {
+    console.log('Error occured:', error);
+    res.json({
+      code: 400,
+      massage: "Error occurred while creating task"
     });
   }
 }
