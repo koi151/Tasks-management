@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const database = require('./config/database');
 require('dotenv').config();
 
@@ -8,6 +9,9 @@ const app = express();
 const port = process.env.PORT;
 
 database.connect();
+
+// parse application/json - bf routes 
+app.use(bodyParser.json())
 
 // Routes Version 1
 routesApiVer1(app);
