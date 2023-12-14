@@ -68,21 +68,25 @@ module.exports.loginPost = async (req, res, next) => {
   next();
 };
 
-// module.exports.forgotPasswordPost = async (req, res, next) => {
-//   if (!req.body.email) {
-//     req.flash('error', "Email must not be empty");
-//     res.redirect('back');
-//     return;
-//   }
+module.exports.forgotPasswordPost = async (req, res, next) => {
+  if (!req.body.email) {
+    res.json({
+      code: 400,
+      message: "Empty email"
+    })
+    return;
+  }
 
-//   if (!isValidEmail(req.body.email)) {
-//     req.flash('error', "Invalid email format");
-//     res.redirect('back');
-//     return;
-//   }
+  if (!isValidEmail(req.body.email)) {
+    res.json({
+      code: 400,
+      message: "Invalid email format"
+    })
+    return;
+  }
 
-//   next();
-// };
+  next();
+};
 
 // module.exports.resetPasswordPost = async (req, res, next) => {
 //   if (!req.body.password) {
