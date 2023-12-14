@@ -40,7 +40,11 @@ module.exports.index = async (req, res) => {
       .limit(paginationObj.limitItems)
       .skip(paginationObj.skip);
 
-    res.json(tasks)
+    res.json({
+      code: 200, 
+      message: "Get tasks successful",
+      tasks: tasks
+    })
 
   } catch (error) {
     console.log('Error occured:', error);
