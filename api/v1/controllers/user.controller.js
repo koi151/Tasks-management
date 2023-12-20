@@ -238,3 +238,25 @@ module.exports.detail = async (req, res) => {
     })
   }
 }
+
+// [GET] /api/v1/user/user-list
+module.exports.userList = async (req, res) => {
+  try {
+    const users = await User.find({
+      deleted: false
+    }).select('fullName email')
+
+    res.json({
+      code: 200,
+      message: 'Successful!',
+      users: users
+    })
+
+  } catch (error) {
+    console.log('Error occurred: ', error);
+    res.json({
+      code: 400,
+      message: 'Not existed'
+    })
+  }
+}

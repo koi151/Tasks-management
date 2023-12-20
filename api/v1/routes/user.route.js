@@ -29,4 +29,7 @@ router.post('/login/reset', controller.resetPassword);
 
 router.get('/detail', authMiddleware.authRequire , controller.detail);
 
+router.get('/user-list', authMiddleware.authRequire , controller.userList);
+
+
 module.exports = router;

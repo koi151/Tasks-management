@@ -12,5 +12,5 @@ module.exports = (app) => {
     taskRoutes
   );
 
-  app.use(version + "/user", userRoutes);
+  app.use(version + "/users", userRoutes);
 }
