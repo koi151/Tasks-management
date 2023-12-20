@@ -30,7 +30,7 @@ module.exports.registerPost = async (req, res) => {
       res.json({
         code: 200,
         message: 'New user account created successfully',
-        token: token
+        token: generateHelper.generateRandomString(30)
       })
 
     } else {
