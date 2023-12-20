@@ -180,3 +180,61 @@ module.exports.otpPassword = async (req, res) => {
     })
   }
 }
+
+
+// [POST] /api/v1/user/password/reset
+module.exports.resetPassword = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      token: req.body.token,
+    })
+    
+    const passwordMatched = bcrypt.compare(req.body.password, user.password);
+
+    if (passwordMatched) {
+      res.json({
+        code: 400,
+        message: 'New password must be different from old password'
+      })
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    await user.updateOne({
+      token: req.body.token
+    }, {
+      password: hashedPassword
+    })
+
+    res.json({
+      code: 200,
+      message: 'New password updated successfully'
+    })
+
+  } catch (error) {
+    console.log('Error occurred:', error);
+    res.json({
+      code: 400,
+      message: 'Not existed'
+    })
+  }
+}
+
+// [POST] /api/v1/user/detail
+module.exports.detail = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      token: req.cookies.token,
+      deleted: false
+    }).select('-password -token');
+
+    res.json(user);
+
+  } catch (error) {
+    console.log('Error occurred: ', error);
+    res.json({
+      code: 400,
+      message: 'Not existed'
+    })
+  }
+}

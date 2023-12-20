@@ -22,9 +22,10 @@ router.post(
   controller.forgotPasswordPost
 );
 
-router.post(
-  '/login/otp',
-  controller.otpPassword
-);
+router.post('/login/otp', controller.otpPassword);
+
+router.post('/login/reset', controller.resetPassword);
+
+router.get('/detail', controller.detail);
 
 module.exports = router;
