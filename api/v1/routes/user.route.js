@@ -3,6 +3,7 @@ const router = express.Router();
 
 const controller = require('../controllers/user.controller');
 const validate = require('../../../validate/user.validate');
+const authMiddleware = require('../../../middlewares/auth.middleware');
 
 router.post(
   '/register',
@@ -26,6 +27,6 @@ router.post('/login/otp', controller.otpPassword);
 
 router.post('/login/reset', controller.resetPassword);
 
-router.get('/detail', controller.detail);
+router.get('/detail', authMiddleware.authRequire , controller.detail);
 
 module.exports = router;

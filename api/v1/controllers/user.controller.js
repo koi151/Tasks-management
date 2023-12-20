@@ -21,6 +21,7 @@ module.exports.registerPost = async (req, res) => {
         fullName: fullName, 
         email: email,
         password: hashedPassword,
+        token: generateHelper.generateRandomString(30)
       })
       await newUser.save();
 
@@ -30,7 +31,7 @@ module.exports.registerPost = async (req, res) => {
       res.json({
         code: 200,
         message: 'New user account created successfully',
-        token: generateHelper.generateRandomString(30)
+        token: token
       })
 
     } else {
@@ -115,7 +116,7 @@ module.exports.forgotPasswordPost = async (req, res) => {
     const forgotPasswordObj = {
       email: email,
       otp: otp,
-      expireAt: Date.now() + expiredTime * 60
+      expireAt: Date.now() + expiredTime * 60 * 1000
     }
 
     const forgotPassword = new ForgotPassword(forgotPasswordObj);
@@ -220,15 +221,14 @@ module.exports.resetPassword = async (req, res) => {
   }
 }
 
-// [POST] /api/v1/user/detail
+// [GET] /api/v1/user/detail
 module.exports.detail = async (req, res) => {
   try {
-    const user = await User.findOne({
-      token: req.cookies.token,
-      deleted: false
-    }).select('-password -token');
-
-    res.json(user);
+    res.json({
+      code: 200,
+      message: 'User info sent successfully',
+      info: req.user
+    })
 
   } catch (error) {
     console.log('Error occurred: ', error);
