@@ -1,33 +1,48 @@
-const Task = require('../model/tasks.model');
+// const Task = require('../model/tasks.model');
+import Task from '../model/tasks.model';
 
-const paginationHelper = require('../../../helpers/pagination');
-const searchHelper = require('../../../helpers/search');
+import { paginationHelper } from '../../../helpers/pagination';
+import { searchHelper } from '../../../helpers/search';
 
 // [GET] /api/v1/tasks/
 module.exports.index = async (req, res) => {
   try {
-    const criterias = {
-      $or: [
-        { createBy: req.user.id },
-        { userList: req.user.id }
-      ],
+
+    // Find
+    interface findCriterias {
+      deleted: boolean,
+      status?: string,
+      title?: RegExp,
+    }
+
+    const find: findCriterias = {
       deleted: false
     }
+
+    if (req.query.status) {
+      find.status = req.query.status.toString();
+    }
+
+    // const criterias = {
+    //   $or: [
+    //     { createBy: req.user.id },
+    //     { userList: req.user.id }
+    //   ],
+    //   deleted: false
+    // }
 
     // SORT
     const sort = {}
 
-    if (req.query.status) {
-      criterias.status = req.query.status
+    if (req.query.sortKey && req.query.sortValue) {
+      const sortKey = req.query.sortKey.toString();
+      sort[sortKey] = req.query.sortValue;
     }
 
-    if (req.query.sortKey && req.query.sortValue) {
-      sort[req.query.sortKey] = req.query.sortValue;
-    }
     // SEARCHING
     const searchObj = searchHelper(req.query);
-    if (searchObj.keyword) {
-      criterias.title = searchObj.regex; 
+    if (searchObj.regex) {
+      find.title = searchObj.regex; 
     }
 
     // PAGINATION
@@ -36,10 +51,10 @@ module.exports.index = async (req, res) => {
       limitItems: 2
     }
 
-    const tasksCount = await Task.countDocuments(criterias);
+    const tasksCount = await Task.countDocuments(find);
     const paginationObj = paginationHelper(initPagination, req.query, tasksCount);
 
-    const tasks = await Task.find(criterias)
+    const tasks = await Task.find(find)
       .sort(sort)
       .limit(paginationObj.limitItems)
       .skip(paginationObj.skip);

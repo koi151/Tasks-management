@@ -66,7 +66,9 @@ module.exports.loginPost = async (req, res) => {
       return;
     }
 
-    const passwordMatched =  bcrypt.compare(req.body.password, existedUser.password);
+    const passwordMatched = await bcrypt.compare(req.body.password, existedUser.password);
+
+    console.log("passwordMatched:", passwordMatched)
     if (passwordMatched) {
       const token = existedUser.token;
       res.cookie('token', token);
