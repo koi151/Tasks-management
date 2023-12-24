@@ -1,11 +1,11 @@
-// const Task = require('../model/tasks.model');
 import Task from '../model/tasks.model';
 
+import { Request, Response } from "express";
 import { paginationHelper } from '../../../helpers/pagination';
 import { searchHelper } from '../../../helpers/search';
 
 // [GET] /api/v1/tasks/
-module.exports.index = async (req, res) => {
+export const index = async (req: Request, res: Response) => {
   try {
 
     // Find
@@ -51,8 +51,10 @@ module.exports.index = async (req, res) => {
       limitItems: 2
     }
 
-    const tasksCount = await Task.countDocuments(find);
-    const paginationObj = paginationHelper(initPagination, req.query, tasksCount);
+    const taskCount = await Task.countDocuments(find);
+    const paginationObj = paginationHelper(initPagination, req.query, taskCount);
+
+    // END PAGINATION
 
     const tasks = await Task.find(find)
       .sort(sort)
@@ -75,14 +77,17 @@ module.exports.index = async (req, res) => {
 }
 
 // [GET] /api/v1/tasks/detail/:id
-module.exports.detail = async (req, res) => {
+export const detail = async (req: Request, res: Response) => {
   try {
+    const id: string = req.params.id; 
+
     const task = await Task.findOne({
-      _id: req.params.id,
+      _id: id,
       deleted: false
     })
 
     res.json(task);
+
   } catch (error) {
     console.log('Error occured:', error);
     res.json({
@@ -93,7 +98,7 @@ module.exports.detail = async (req, res) => {
 }
 
 // [PATCH] /api/v1/tasks/change-status/:id
-module.exports.changeStatus = async (req, res) => {
+export const changeStatus = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
 
@@ -118,7 +123,7 @@ module.exports.changeStatus = async (req, res) => {
 }
 
 // [PATCH] /api/v1/tasks/change-multi
-module.exports.changeMulti = async (req, res) => {
+export const changeMulti = async (req: Request, res: Response) => {
   try {
     const {ids, key, value} = req.body; 
 
@@ -168,9 +173,9 @@ module.exports.changeMulti = async (req, res) => {
 }
 
 // [POST] /api/v1/tasks/create
-module.exports.create = async (req, res) => {
+export const create = async (req: Request, res: Response) => {
   try {
-    req.body.createdBy = req.user.id;
+    // req.body.createdBy = req.user.id;
     const task = new Task(req.body)
     await task.save();
 
@@ -189,7 +194,7 @@ module.exports.create = async (req, res) => {
 }
 
 // [PATCH] /api/v1/tasks/edit/:id
-module.exports.editPatch = async (req, res) => {
+export const editPatch = async (req: Request, res: Response) => {
   try {
     await Task.updateOne(
       { _id: req.params.id }, 
@@ -211,7 +216,7 @@ module.exports.editPatch = async (req, res) => {
 }
 
 // [DELETE] /api/v1/tasks/delete/:id
-module.exports.deleteTask = async (req, res) => {
+export const deleteTask = async (req: Request, res: Response) => {
   try {
     await Task.updateOne({
       _id: req.params.id

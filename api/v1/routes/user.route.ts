@@ -1,9 +1,10 @@
-const express = require('express');
-const router = express.Router();
+import { Router } from 'express';
 
-const controller = require('../controllers/user.controller');
-const validate = require('../../../validate/user.validate');
-const authMiddleware = require('../../../middlewares/auth.middleware');
+const router: Router = Router();
+
+import * as controller from '../controllers/user.controller';
+import * as validate from "../../../validate/user.validate";
+import * as authMiddleware from "../../../middlewares/auth.middleware";
 
 router.post(
   '/register',
@@ -32,4 +33,4 @@ router.get('/detail', authMiddleware.authRequire , controller.detail);
 router.get('/user-list', authMiddleware.authRequire , controller.userList);
 
 
-module.exports = router;
+export const userRoutes: Router = router;

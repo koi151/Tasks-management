@@ -1,6 +1,6 @@
 import { Express } from 'express'; 
-import { taskRoutes } from './tasks.route.js';
-import { userRoutes } from './user.route.js';
+import { taskRoutes } from './tasks.route';
+import { userRoutes } from './user.route';
 
 import authMiddleware from '../../../middlewares/auth.middleware';
 

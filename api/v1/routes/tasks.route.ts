@@ -1,21 +1,20 @@
-import { Router } from 'express';
-import * as controller from '../controllers/tasks.controller';
+import { Router } from "express";
+import * as controller from "../controllers/tasks.controller";
 
 const router: Router = Router();
 
-router.get('/', controller.index);
+router.get("/", controller.index);
 
-router.get('/detail/:id', controller.detail);
+router.get("/detail/:id", controller.detail);
 
-router.patch('/change-status/:id', controller.changeStatus);
+router.patch("/change-status/:id", controller.changeStatus);
 
-router.patch('/change-multi', controller.changeMulti);
+router.patch("/change-multi", controller.changeMulti);
 
-router.patch('/edit/:id', controller.editPatch);
+router.post("/create", controller.create);
 
-router.post('/create', controller.create);
+router.patch("/edit/:id", controller.editPatch);
 
-router.delete('/delete/:id', controller.deleteTask);
+router.delete("/delete/:id", controller.deleteTask);
 
-// module.exports = router;
-export const taskRoutes: Router = router; 
+export const taskRoutes: Router = router;
