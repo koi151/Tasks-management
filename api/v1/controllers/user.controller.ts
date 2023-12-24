@@ -1,12 +1,14 @@
-const User = require('../model/user.model');
-const ForgotPassword = require('../model/forgot-password.model');
+import { Request, Response } from 'express';
 
-const generateHelper = require('../../../helpers/generateString');
-const sendMailHelper = require('../../../helpers/sendMail');
-const bcrypt = require('bcrypt');
+import User from '../model/user.model';
+import ForgotPassword from '../model/forgot-password.model';
+
+import { generateRandomString, generateRandomNumber } from '../../../helpers/generateString';
+import { sendMailHelper } from '../../../helpers/sendMail';
+import bcrypt from 'bcrypt';
 
 // [POST] /api/v1/user/register
-module.exports.registerPost = async (req, res) => {
+export const registerPost = async (req: Request, res: Response) => {
   try {
     let { fullName, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -21,7 +23,7 @@ module.exports.registerPost = async (req, res) => {
         fullName: fullName, 
         email: email,
         password: hashedPassword,
-        token: generateHelper.generateRandomString(30)
+        token: generateRandomString(30)
       })
       await newUser.save();
 
@@ -51,7 +53,7 @@ module.exports.registerPost = async (req, res) => {
 }
 
 // [POST] /api/v1/user/login
-module.exports.loginPost = async (req, res) => {
+export const loginPost = async (req: Request, res: Response) => {
   try {
     const existedUser = await User.findOne({
       email: req.body.email,
@@ -95,7 +97,7 @@ module.exports.loginPost = async (req, res) => {
 }
 
 // [POST] /api/v1/user/login/forgot
-module.exports.forgotPasswordPost = async (req, res) => {
+export const forgotPasswordPost = async (req: Request, res: Response) => {
   try {
     const email = req.body.email;
     
@@ -112,7 +114,7 @@ module.exports.forgotPasswordPost = async (req, res) => {
       return;
     }
 
-    const otp = generateHelper.generateRandomNumber(6);
+    const otp = generateRandomNumber(6);
     const expiredTime = 5;
 
     const forgotPasswordObj = {
@@ -131,7 +133,7 @@ module.exports.forgotPasswordPost = async (req, res) => {
       <p>OTP code expires in 2 minutes, do not share the code.</p>
     `
 
-    sendMailHelper.sendMail(email, subject, content);
+    sendMailHelper(email, subject, content);
 
     res.json({
       code: 200,
@@ -148,7 +150,7 @@ module.exports.forgotPasswordPost = async (req, res) => {
 }
 
 // [POST] /api/v1/user/password/otp
-module.exports.otpPassword = async (req, res) => {
+export const otpPassword = async (req: Request, res: Response) => {
   try {
     const result = await ForgotPassword.findOne({
       email: req.body.email,
@@ -186,7 +188,7 @@ module.exports.otpPassword = async (req, res) => {
 
 
 // [POST] /api/v1/user/password/reset
-module.exports.resetPassword = async (req, res) => {
+export const resetPassword = async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({
       token: req.body.token,
@@ -224,12 +226,12 @@ module.exports.resetPassword = async (req, res) => {
 }
 
 // [GET] /api/v1/user/detail
-module.exports.detail = async (req, res) => {
+export const detail = async (req: Request, res: Response) => {
   try {
     res.json({
       code: 200,
       message: 'User info sent successfully',
-      info: req.user
+      info: req["infoUser"]
     })
 
   } catch (error) {
@@ -242,7 +244,7 @@ module.exports.detail = async (req, res) => {
 }
 
 // [GET] /api/v1/user/user-list
-module.exports.userList = async (req, res) => {
+export const userList = async (req: Request, res: Response) => {
   try {
     const users = await User.find({
       deleted: false
