@@ -1,6 +1,7 @@
-const User = require('../api/v1/model/user.model');
+import { Request, Response, NextFunction } from 'express';
+import User from '../api/v1/model/user.model';
 
-module.exports.authRequire = async (req, res, next) => {
+export const authRequire = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     if (req.headers.authorization) {
       const token = req.headers.authorization.split(' ')[1];
@@ -17,7 +18,7 @@ module.exports.authRequire = async (req, res, next) => {
         })
       }
 
-      req.user = user;
+      req['user'] = user;
       next();
 
     } else {

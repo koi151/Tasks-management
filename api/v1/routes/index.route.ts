@@ -2,7 +2,7 @@ import { Express } from 'express';
 import { taskRoutes } from './tasks.route';
 import { userRoutes } from './user.route';
 
-import authMiddleware from '../../../middlewares/auth.middleware';
+import * as authMiddleware from '../../../middlewares/auth.middleware';
 
 const mainV1Routes = (app: Express): void => {
   const version: string = "/api/v1"; 
