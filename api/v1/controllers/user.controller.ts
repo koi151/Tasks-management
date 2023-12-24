@@ -151,14 +151,17 @@ export const forgotPasswordPost = async (req: Request, res: Response) => {
 // [POST] /api/v1/user/password/otp
 export const otpPassword = async (req: Request, res: Response) => {
   try {
+    const email: string = req.body.email;
+    const otp: string = req.body.otp;
+
     const result = await ForgotPassword.findOne({
-      email: req.body.email,
-      otp: req.body.otp
+      email: email,
+      otp: otp
     })
 
     if (result) {
       const user = await User.findOne({
-        email: req.body.email
+        email: email
       })
 
       const token = user.token;
@@ -189,11 +192,14 @@ export const otpPassword = async (req: Request, res: Response) => {
 // [POST] /api/v1/user/password/reset
 export const resetPassword = async (req: Request, res: Response) => {
   try {
+    const token: string = req.body.token;
+    const password: string = req.body.password;
+
     const user = await User.findOne({
-      token: req.body.token,
+      token: token,
     })
     
-    const passwordMatched = bcrypt.compare(req.body.password, user.password);
+    const passwordMatched = bcrypt.compare(password, user.password);
 
     if (passwordMatched) {
       res.json({
@@ -203,9 +209,9 @@ export const resetPassword = async (req: Request, res: Response) => {
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     await user.updateOne({
-      token: req.body.token
+      token: token
     }, {
       password: hashedPassword
     })
@@ -230,7 +236,7 @@ export const detail = async (req: Request, res: Response) => {
     res.json({
       code: 200,
       message: 'User info sent successfully',
-      info: req["infoUser"]
+      info: req["user"]
     })
 
   } catch (error) {

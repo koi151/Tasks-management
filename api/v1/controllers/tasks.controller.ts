@@ -5,7 +5,11 @@ import { paginationHelper } from '../../../helpers/pagination';
 import { searchHelper } from '../../../helpers/search';
 
 // [GET] /api/v1/tasks/
-export const index = async (req: Request, res: Response) => {
+interface CustomRequestIndex extends Request {
+  user: { id: string }
+}
+
+export const index = async (req: CustomRequestIndex, res: Response) => {
   try {
 
     // Find
@@ -13,6 +17,7 @@ export const index = async (req: Request, res: Response) => {
       deleted: boolean,
       status?: string,
       title?: RegExp,
+      // $or?: { createBy: string; userList: string; }[];
     }
 
     const find: findCriterias = {
@@ -23,13 +28,11 @@ export const index = async (req: Request, res: Response) => {
       find.status = req.query.status.toString();
     }
 
-    // const criterias = {
-    //   $or: [
-    //     { createBy: req.user.id },
-    //     { userList: req.user.id }
-    //   ],
-    //   deleted: false
-    // }
+    // find.$or = [
+    //   { createBy: req.user.id },
+    //   { userList: req.user.id }
+    // ];
+  
 
     // SORT
     const sort = {}
@@ -125,10 +128,17 @@ export const changeStatus = async (req: Request, res: Response) => {
 // [PATCH] /api/v1/tasks/change-multi
 export const changeMulti = async (req: Request, res: Response) => {
   try {
-    const {ids, key, value} = req.body; 
+    enum Key {
+      STATUS = 'status',
+      DELETE = 'delete',
+    }    
+
+    const ids: string[] = req.body.ids;
+    const key: Key = req.body.key;
+    const value: string[] = req.body.value;
 
     switch(key) {
-      case "status": 
+      case Key.STATUS:
         await Task.updateMany({
           _id: { $in: ids }
         }, {
@@ -141,7 +151,7 @@ export const changeMulti = async (req: Request, res: Response) => {
         });
         break;
       
-      case "delete":
+      case Key.DELETE:
         await Task.updateMany({
           _id: { $in: ids }
         }, {
@@ -173,9 +183,13 @@ export const changeMulti = async (req: Request, res: Response) => {
 }
 
 // [POST] /api/v1/tasks/create
-export const create = async (req: Request, res: Response) => {
+interface CustomRequestCreate extends Request {
+  user: { id: string };  
+} 
+
+export const create = async (req: CustomRequestCreate, res: Response) => {
   try {
-    // req.body.createdBy = req.user.id;
+    req.body.createdBy = req.user.id;
     const task = new Task(req.body)
     await task.save();
 
@@ -196,10 +210,9 @@ export const create = async (req: Request, res: Response) => {
 // [PATCH] /api/v1/tasks/edit/:id
 export const editPatch = async (req: Request, res: Response) => {
   try {
-    await Task.updateOne(
-      { _id: req.params.id }, 
-      req.body
-    )
+    const id: string = req.params.id;
+
+    await Task.updateOne({ _id: id }, req.body)
      
     res.json({
       code: 200,
@@ -218,8 +231,10 @@ export const editPatch = async (req: Request, res: Response) => {
 // [DELETE] /api/v1/tasks/delete/:id
 export const deleteTask = async (req: Request, res: Response) => {
   try {
+    const id: string = req.params.id;
+
     await Task.updateOne({
-      _id: req.params.id
+      _id: id
     }, {
       deleted: true,
       deletedAt: Date()
